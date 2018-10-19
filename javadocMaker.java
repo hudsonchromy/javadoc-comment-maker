@@ -1,167 +1,92 @@
-import java.util.ArrayList;
-import java.text.DecimalFormat;
-import java.io.IOException;
-import java.io.File;
 import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;  
+import java.util.Date;
 
-/**
-*
-*@author: Hudson Chromy
-*@dat:10/5/18
-*/
 
-public class IcosahedronList {
-/**
-*Creates an object that is a list of icosahedron objects.
-*/
-
-   private String listName;
-   private ArrayList<Icosahedron> icosahedronList;
-    /**
-    *Creates a list of Icosahedron objects.
-    *
-    *@param lisstNameIn
-    *@param iListIn
-    */
-   IcosahedronList(String listNameIn, ArrayList<Icosahedron> iListIn) {
-      listName = listNameIn;
-      icosahedronList = iListIn;
+public class javadocMaker {
+   public static void main(String[] args) throws IOException {
+      String nxt;
+      //String date;
+      String returnType;
+      String label = "";
+      String NAME = "Hudson Chromy";
+      int ends;
+      int starts;
+      boolean LABEL;
+      boolean date_done = false;
       
-   }
-   public int numberOfIcosahedrons() {
-      return icosahedronList.size();
-   }
-   public String getName() {
-      return listName;
-   }
-   public ArrayList<Icosahedron> getList() {
-      return icosahedronList;
-   }
-   
-   public IcosahedronList readFile(String fileName) throws IOException {
+      System.out.print("File Name: ");
+      Scanner userInput = new Scanner(System.in);
+      String fileName = userInput.nextLine();
+      System.out.print("Would you like to label the comments? ");
+      String decision = userInput.nextLine();
+      if(decision.charAt(0) == 'y') {
+         LABEL = true;
+      } else {
+         LABEL = false;
+      }
+      
+      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+      Date date = new Date();
+      FileWriter fw = new FileWriter("new" + fileName);
+      PrintWriter pw = new PrintWriter(fw);
       Scanner scanFile = new Scanner(new File(fileName));
-      String nameList = scanFile.nextLine();
-      listName = nameList;
-      while(scanFile.hasNext()) {
-         String name = scanFile.nextLine();
-         String color = scanFile.nextLine();
-         double sideLength =  Double.parseDouble(scanFile.nextLine());
-         Icosahedron i = new Icosahedron(name, color, sideLength);
-         icosahedronList.add(i);
-      }
-      IcosahedronList newList = new IcosahedronList(nameList, icosahedronList);
-      return newList;
-   }
-   
-   public void addIcosahedron(String label, String color, double edge) {
-      Icosahedron newI = new Icosahedron(label, color, edge);
-      icosahedronList.add(newI);
-   }
-   
-   public Icosahedron findIcosahedron(String label) {
-      label = label.toUpperCase();
-      for (Icosahedron ico: icosahedronList) {
-         if(ico.getLabel().toUpperCase().equals(label)) {
-            return ico;
+      
+      
+      while(scanFile.hasNextLine()) {
+         //System.out.println("hello");
+         nxt = scanFile.nextLine();
+         if(nxt.length() > 6 && !nxt.substring(0, 6).equals("import") && date_done == false) {
+            pw.println("/**\n*\n*author: " + NAME + "\n*date: " + formatter.format(date) + "\n*/");
+            date_done = true;
          }
-      }
-      return null;
-   }
-   
-   public Icosahedron deleteIcosahedron(String label) {
-      label = label.toUpperCase();
-      for (Icosahedron ico : icosahedronList) {
-         if(ico.getLabel().toUpperCase().equals(label)) {
-            icosahedronList.remove(ico);
-            return ico;
+         if(nxt.trim().length() > 7 && nxt.trim().substring(0, 6).equals("public") && !nxt.trim().substring(7, 12).equals("class")) {
+            ends = nxt.lastIndexOf(" ", nxt.indexOf("("));
+            starts = nxt.lastIndexOf(" ", ends-1);
+            returnType = nxt.substring(starts, ends);
+            pw.println("\t/**");
+            //get label for return
+            if(LABEL) {
+               System.out.print(returnType + ": ");
+               label = userInput.nextLine();
+            }
+            pw.println("\t*@return" + returnType + " " + label);
+            if(nxt.indexOf("()") == -1) {
+               ends = 0;
+               starts = nxt.indexOf("(") + 3;
+               starts = nxt.indexOf(" ", starts);
+               if(nxt.indexOf(",") != -1){
+                  while(nxt.indexOf(",", ends+1) != -1) {
+                     ends = nxt.indexOf(",", starts);
+                     //gets label for param
+                     if(LABEL) {
+                        System.out.print(nxt.substring(starts, ends) + ": ");
+                        label = userInput.nextLine();
+                     }
+                     pw.println("\t*@param" + nxt.substring(starts, ends) + " " + label);
+                     starts = nxt.indexOf(",", ends) + 3;
+                     starts = nxt.indexOf(" ", starts);
+                  }
+               }
+               ends = nxt.indexOf(")");
+               //get label for param
+               if(LABEL) {
+                  System.out.print(nxt.substring(starts, ends) + ": ");
+                  label = userInput.nextLine();
+               }
+               pw.println("\t*@param" + nxt.substring(starts, ends) + " " +label);
+               
+            }
+            //pw.println("\t*");
+            pw.println("\t*/");
          }
+         pw.println(nxt);
       }
-      return null;
-   }
-   
-   public boolean editIcosahedron(String label, String color, double edge) {
-      for (Icosahedron ico : icosahedronList) {
-         //System.out.println(ico.getLabel());
-         //System.out.println(label);
-         if(ico.getLabel().toUpperCase().equals(label.toUpperCase())) {
-            ico.setColor(color);
-            ico.setEdge(edge);
-            return true;
-         }
-      }
-      return false;
-   }
-   public String toString() {
-      String out = listName + "\n";
-      int size = numberOfIcosahedrons();
-      int i = 0;
-      while (i < size) {
-         out += "\n" + icosahedronList.get(i).toString() + "\n";
-         i++;
-      }
-      return out;
-   }
-   public double totalSurfaceArea() {
-      int i = 0;
-      double out = 0;
-      while (i < numberOfIcosahedrons()) {
-         out += icosahedronList.get(i).surfaceArea();
-         i++;
-      }
-      return out;
-   }
-   public double totalVolume() {
-      int i = 0;
-      double out = 0;
-      while (i < numberOfIcosahedrons()) {
-         out += icosahedronList.get(i).volume();
-         i++;
-      }
-      return out;
-   }
-   public double averageSurfaceArea() {
-      double out = 0;
-      if (numberOfIcosahedrons() != 0) {
-         out = totalSurfaceArea() / numberOfIcosahedrons();
-      } 
-      return out;
-   }
-   public double averageVolume() {
-      double out = 0;
-      if (numberOfIcosahedrons() != 0) {
-         out = totalVolume() / numberOfIcosahedrons();
-      }
-      return out;
-   }
-   public double averageSurfaceToVolumeRatio() {
-      double out = 0;
-      int i = 0;
-      while (i < numberOfIcosahedrons()) {
-         out += icosahedronList.get(i).surfaceToVolumeRatio();
-         i++;
-      }
-      if (numberOfIcosahedrons() != 0) {
-         out /= numberOfIcosahedrons();
-      }
-      return out;
-   }
-   public String summaryInfo() {
-      DecimalFormat df = new DecimalFormat("#,##0.0##");
-      String out = "";
-      if (numberOfIcosahedrons() != 0) {
-         out += "----- Summary for Icosahedron Test List -----";
-      }
-      else {
-         out += "----- Summary for Icosahedron Empty Test List -----";
-      }
-      //----- Summary for Icosahedron ___t_________________
-      out += "\nNumber of Icosahedrons: " + numberOfIcosahedrons();
-      out += "\nTotal Surface Area: " + df.format(totalSurfaceArea());
-      out += "\nTotal Volume: " + df.format(totalVolume());
-      out += "\nAverage Surface Area: " + df.format(averageSurfaceArea());
-      out += "\nAverage Volume: " + df.format(averageVolume());
-      out += "\nAverage Surface/Volume Ratio: " 
-         + df.format(averageSurfaceToVolumeRatio());
-      return out;
+      pw.println("//Edited");
+      pw.close();
    }
 }
