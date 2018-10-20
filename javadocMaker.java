@@ -5,7 +5,11 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;  
 import java.util.Date;
-
+/**
+*
+*@author: Hudson Chromy
+*@date: 10/19/2018
+*/
 
 public class javadocMaker {
    public static void main(String[] args) throws IOException {
@@ -29,21 +33,24 @@ public class javadocMaker {
       } else {
          LABEL = false;
       }
-      
+      //establish date
       SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
       Date date = new Date();
+      //establish file writer and scanner
       FileWriter fw = new FileWriter("new" + fileName);
       PrintWriter pw = new PrintWriter(fw);
       Scanner scanFile = new Scanner(new File(fileName));
       
-      
+      //run through file
       while(scanFile.hasNextLine()) {
-         //System.out.println("hello");
+ 
          nxt = scanFile.nextLine();
+         //check to do header
          if(nxt.length() > 6 && !nxt.substring(0, 6).equals("import") && date_done == false) {
             pw.println("/**\n*\n*author: " + NAME + "\n*date: " + formatter.format(date) + "\n*/");
             date_done = true;
          }
+         //check if this line is a class
          if(nxt.trim().length() > 7 && nxt.trim().substring(0, 6).equals("public") && !nxt.trim().substring(7, 12).equals("class")) {
             ends = nxt.lastIndexOf(" ", nxt.indexOf("("));
             starts = nxt.lastIndexOf(" ", ends-1);
@@ -54,7 +61,9 @@ public class javadocMaker {
                System.out.print(returnType + ": ");
                label = userInput.nextLine();
             }
+            //put in the return commment
             pw.println("\t*@return" + returnType + " " + label);
+            //check to see if there are 
             if(nxt.indexOf("()") == -1) {
                ends = 0;
                starts = nxt.indexOf("(") + 3;
