@@ -13,7 +13,9 @@ public class javadocMaker {
       //String date;
       String returnType;
       String label = "";
+      /*********************************************/
       String NAME = "Hudson Chromy";
+      /********************************************/
       int ends;
       int starts;
       boolean LABEL;
