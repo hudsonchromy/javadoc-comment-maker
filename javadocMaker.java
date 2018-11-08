@@ -13,8 +13,8 @@ public class javadocMaker {
       //String date;
       String returnType;
       String label = "";
-      /*********************************************/
-      String NAME = "Hudson Chromy";
+      /********************************************/
+              String NAME = "Hudson Chromy";
       /********************************************/
       int ends;
       int starts;
@@ -47,6 +47,11 @@ public class javadocMaker {
          if(nxt.length() > 6 && !nxt.substring(0, 6).equals("import") && date_done == false) {
             pw.println("/**\n*\n*author: " + NAME + "\n*date: " + formatter.format(date) + "\n*/");
             date_done = true;
+         }
+         if(nxt.indexOf("abstract") != -1) {
+            pw.println("\t/**\n\t*\n\t*/");
+            pw.println(nxt);
+            continue;
          }
          if(nxt.trim().length() > 7 && nxt.trim().substring(0, 6).equals("public") && !nxt.trim().substring(7, 12).equals("class") && nxt.indexOf("{") != -1) {
             if(nxt.indexOf(constructor) != -1) {
@@ -123,4 +128,5 @@ public class javadocMaker {
 	   
    }
 }
+
 
